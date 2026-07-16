@@ -1,266 +1,113 @@
 # log-pipline
-An end-to-end data engineering project demonstrating log generation, data ingestion, ETL processing with PySpark, data storage, and visualization for analytics. 
 
-🚀 Log Pipeline with Apache Flume, Hadoop & PySpark
+An end-to-end Data Engineering project demonstrating real-time log generation, data ingestion using Apache Flume, fault-tolerant storage in Hadoop HDFS, ETL processing with Apache Spark (PySpark), and analytics visualization using Matplotlib.
 
-An end-to-end Data Engineering project that simulates real-time log generation, ingests data using Apache Flume, stores it in Hadoop HDFS, processes it with Apache Spark (PySpark), and visualizes the results using Matplotlib.
-
----
-
-📌 Project Overview
-
-This project demonstrates a complete Data Engineering pipeline from data generation to visualization.
-
-Architecture
-
-Python Log Generator
-        │
-        ▼
- Apache Flume
-        │
-        ▼
-   Hadoop HDFS
-        │
-        ▼
- Apache Spark (PySpark)
-        │
-        ▼
- Data Processing (ETL)
-        │
-        ▼
- Matplotlib Visualization
-
----
-<img width="1536" height="1024" alt="WhatsApp Image 2026-07-16 at 10 11 06 AM" src="https://github.com/user-attachments/assets/803a5422-0976-4b5f-bafe-4af76b80de75" />
+🚀 **Log Pipeline with Apache Flume, Hadoop & PySpark**
 
 ---
 
-🛠 Technologies
+## 📌 Project Overview
+This project simulates a real-world big data pipeline. It continuously generates application logs, captures them via a streaming ingestion tool, stores them in a distributed file system, and processes them using an in-memory compute engine to extract structured analytics. 
 
-- Python 3
-- Apache Flume
-- Apache Hadoop (HDFS)
-- Apache Spark (PySpark)
-- Matplotlib
-- Linux
-- Git & GitHub
+**Architecture Flow:**
+Python Log Generator ➡️ Apache Flume ➡️ Hadoop HDFS ➡️ Apache Spark (PySpark) ➡️ Matplotlib Visualization
 
 ---
 
-📂 Project Structure
+## 🛠 Technologies & Tools
+*   **Data Generation:** Python 3 (time, random, datetime)
+*   **Ingestion:** Apache Flume
+*   **Storage:** Apache Hadoop (HDFS)
+*   **Processing (ETL):** Apache Spark (PySpark)
+*   **Visualization:** Matplotlib, Pandas
+*   **Environment:** Linux (Ubuntu/Arch)
 
-log_pipeline/
-│
-├── log.py
-├── README.md
-│
+---
+
+## 📁 Project Structure
+```text
+log-pipline/
+├── .gitignore               # Ignores __pycache__, local logs, and system files
+├── README.md                # Project documentation
+├── requirements.txt         # Python dependencies
+├── run_pipeline.sh          # Master bash script for automated execution
+├── log.py                   # Script to generate mock application logs
+├── process.py               # PySpark script for ETL and aggregation
+├── visualize.py             # Script to generate log distribution charts
 ├── flume-conf/
-│   └── taildir-to-hdfs.conf
-│
-└── images/
-    ├── architecture.png
-    ├── flowchart.png
-    └── dashboard.png
+│   └── taildir-to-hdfs.conf # Flume agent configuration
+└── images/                  # Diagrams and output charts
+```
 
----
+## ⚙️ Project Workflow
+Generate Logs: log.py generates continuous, random application logs (INFO, DEBUG, ERROR, etc.) and appends them to a local file.
+Ingest Data: Apache Flume monitors the local log file using a Taildir source and streams new entries.
+Store Data: Flume sinks the ingested data directly into a distributed Hadoop HDFS directory.
+Process (ETL): PySpark reads the raw text from HDFS, applies schema-on-read by splitting the strings into date, time, and level columns, and aggregates the log level counts.
+Visualize: The aggregated DataFrame is converted to Pandas and plotted into a bar chart via Matplotlib.
 
-⚙️ Project Workflow
+## 🚀 Installation & Execution
+### 1. Prerequisites & Environment Setup
 
-1. Generate random log data using Python.
-2. Apache Flume monitors the log file.
-3. Flume transfers logs into Hadoop HDFS.
-4. Spark reads data from HDFS.
-5. Spark cleans and transforms the data.
-6. Aggregate log levels.
-7. Visualize the results using Matplotlib.
+Ensure Hadoop and Spark are installed and your environment variables ($HADOOP_HOME, $SPARK_HOME) are properly configured.
 
----
+Install the required Python dependencies:
+```Bash
+pip install -r requirements.txt
+```
+### 2. Start Hadoop Services
 
-🚀 Installation & Execution
-
-1️⃣ Create Project Folder
-
-mkdir -p ~/log_pipeline
-cd ~/log_pipeline
-
----
-
-2️⃣ Create Python Log Generator
-
-nano log.py
-
-Paste the Python code and save the file.
-
-Create the log file:
-
-touch ~/Desktop/app.logs
-
----
-
-3️⃣ Create Flume Configuration
-
-mkdir ~/flume-conf
-nano ~/flume-conf/taildir-to-hdfs.conf
-
-Paste the Flume configuration and save.
-
----
-
-4️⃣ Start Hadoop
-
+Initialize your HDFS and YARN daemons, then create the target directory for Flume:
+```Bash
 start-all.sh
-
-Verify services:
-
-jps
-
----
-
-5️⃣ Create HDFS Directory
-
 hdfs dfs -mkdir -p /user/bigdata/flume-logs
+```
+### 3. Run the Pipeline
 
----
+Instead of running interactive terminal commands, you can execute the entire pipeline using the included shell script or run the components manually:
 
-6️⃣ Start Apache Flume
+Terminal 1: Start the Log Generator
+```Bash
+python3 log.py
+```
+Terminal 2: Start the Apache Flume Agent
+```Bash
 
-cd ~/apache-flume-1.7.0-bin
+flume-ng agent \
+  --conf conf \
+  --conf-file flume-conf/taildir-to-hdfs.conf \
+  --name agent \
+  -Dflume.root.logger=INFO,console
+```
+Terminal 3: Execute PySpark ETL and Visualization
+Bash
+```
+# Submit the Spark job for processing
+spark-submit process.py
 
-bin/flume-ng agent \
---conf conf \
---conf-file /home/bigdata/flume-conf/taildir-to-hdfs.conf \
---name agent \
--Dflume.root.logger=INFO,console
+# Generate the visualization
+python3 visualize.py
+```
+## 📈 System Expandability
+A core requirement for this system is that it remains expandable as data velocity increases. To achieve this, future iterations will focus entirely on improving internal algorithm scalability (such as migrating from batch PySpark processing to Spark Structured Streaming for true real-time updates). The pipeline is designed to handle heavier computational loads natively without requiring an increase in team size to manage or maintain the infrastructure.
 
----
+## 📊 Expected Output
+Continuous random log generation stored locally.
+Fault-tolerant log storage replicated in Hadoop HDFS.
+Clean, structured tabular data processed by Apache Spark.
+A generated bar_chart.png visualizing the frequency distribution of system log levels.
 
-7️⃣ Run Python Log Generator
+## 🎓 Learning Outcomes
+Architecting an end-to-end Data Engineering pipeline.
+Configuring and deploying Apache Flume for continuous data ingestion.
+Managing distributed storage with Hadoop HDFS.
+Performing scalable ETL transformations with Apache Spark.
+Writing automated, reproducible execution scripts.
 
-Open another terminal:
-
-python3 ~/log_pipeline/log.py
-
----
-
-8️⃣ Verify Logs in HDFS
-
-hdfs dfs -ls /user/bigdata/flume-logs
-
----
-
-9️⃣ Start PySpark
-
-pyspark
-
----
-
-🔟 Read Logs
-
-df = spark.read.text("hdfs://localhost:9000/user/bigdata/flume-logs/")
-
-df.show(truncate=False)
-
----
-
-1️⃣1️⃣ Split Log Fields
-
-from pyspark.sql.functions import split
-
-df_split = df.withColumn(
-    "date",
-    split(df["value"], " ").getItem(0)
-).withColumn(
-    "time",
-    split(df["value"], " ").getItem(1)
-).withColumn(
-    "level",
-    split(df["value"], " ").getItem(2)
-)
-
-df_split.show()
-
----
-
-1️⃣2️⃣ Count Log Levels
-
-log_counts = df_split.groupBy("level").count()
-
-log_counts.show()
-
----
-
-1️⃣3️⃣ Collect Results
-
-pdf = log_counts.collect()
-
-levels = [row["level"] for row in pdf]
-counts = [row["count"] for row in pdf]
-
----
-
-1️⃣4️⃣ Visualize Data
-
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(8,5))
-plt.bar(levels, counts)
-plt.title("Log Levels Distribution")
-plt.xlabel("Log Level")
-plt.ylabel("Count")
-plt.show()
-
----
-
-🛑 Stop the Project
-
-Stop Python
-
-Ctrl + C
-
-Stop Flume
-
-Ctrl + C
-
-Exit Spark
-
-exit()
-
-Stop Hadoop
-
-stop-all.sh
-
----
-
-📊 Expected Output
-
-- Random log generation
-- Logs stored in Hadoop HDFS
-- Data processed with Apache Spark
-- Log level statistics
-- Bar chart visualization
-
----
-
-📚 Learning Outcomes
-
-- Build an end-to-end Data Engineering pipeline.
-- Understand Apache Flume data ingestion.
-- Store files in Hadoop HDFS.
-- Process large-scale data with Apache Spark.
-- Perform ETL transformations.
-- Visualize processed data.
-- Work with Linux and GitHub.
-
----
-
-👨‍💻 Team Members
-
+## 👨‍💻 Team Members
 - Shenouda Aboelrose
 - Abdelrahman Ahmed Mohamed
 - Mohamed Mo'men Mohamed Abdullah
 
----
-
-📄 License
-
+## 📄 License
 This project is created for educational purposes.
