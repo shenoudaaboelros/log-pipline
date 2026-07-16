@@ -1,0 +1,8 @@
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(8,5))
+plt.bar(levels, counts)
+plt.title("Log Levels Distribution")
+plt.xlabel("Log Level")
+plt.ylabel("Count")
+plt.show()
