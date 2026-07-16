@@ -31,6 +31,9 @@ Python Log Generator
  Matplotlib Visualization
 
 ---
+<img width="1536" height="1024" alt="WhatsApp Image 2026-07-16 at 10 11 06 AM" src="https://github.com/user-attachments/assets/803a5422-0976-4b5f-bafe-4af76b80de75" />
+
+---
 
 🛠 Technologies
 
